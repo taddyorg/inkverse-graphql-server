@@ -1,0 +1,9 @@
+node_modules
+.DS_Store
+.env
+.idea/
+.vscode/
+private/*
+yarn-error.log
+scripts/node_modules
+dist/

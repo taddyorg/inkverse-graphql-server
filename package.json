@@ -1,0 +1,39 @@
+{
+  "name": "graphql-server",
+  "version": "1.0.0",
+  "main": "dist/server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "rm -rf dist && tsc",
+    "dev": "tsx watch src/server.ts",
+    "dev:build": "npm run build && npm run dev",
+    "start": "npm run build && node dist/server.js"
+  },
+  "type": "module",
+  "author": "Inkverse",
+  "license": "AGPL-3.0",
+  "description": "GraphQL Server for Inkverse",
+  "dependencies": {
+    "@apollo/server": "^4.11.0",
+    "axios": "^1.7.7",
+    "cors": "^2.8.5",
+    "dataloader": "^2.2.2",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0",
+    "graphql": "^16.9.0",
+    "graphql-tag": "^2.12.6",
+    "lodash": "^4.17.21",
+    "notion-client": "^6.16.0",
+    "uuid": "^10.0.0"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/lodash": "^4.17.10",
+    "@types/node": "^22.7.4",
+    "@types/uuid": "^10.0.0",
+    "nodemon": "^3.0.1",
+    "oxlint": "^0.9.9",
+    "tsx": "^4.19.1",
+    "typescript": "^5.6.2"
+  }
+}
