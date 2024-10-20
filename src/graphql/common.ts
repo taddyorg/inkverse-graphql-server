@@ -7,7 +7,7 @@ enum SortOrder {
   SEARCH
 }
 
-" Countries "
+" Countries (ISO 3166-1 https://en.wikipedia.org/wiki/ISO_3166-1) "
 enum Country {
   AFGHANISTAN
   ALAND_ISLANDS
@@ -260,7 +260,7 @@ enum Country {
   ZIMBABWE
 }
 
-" Languages "
+" Languages (ISO 639-2 https://en.wikipedia.org/wiki/List_of_ISO_639-2_codes) "
 enum Language {
   ABKHAZIAN
   AFAR

@@ -7,7 +7,8 @@
     "build": "rm -rf dist && tsc",
     "dev": "tsx watch src/server.ts",
     "dev:build": "npm run build && npm run dev",
-    "start": "npm run build && node dist/server.js"
+    "start": "npm run build && node dist/server.js",
+    "codegen": "graphql-codegen --config src/codegen.ts"
   },
   "type": "module",
   "author": "Inkverse",
@@ -27,12 +28,14 @@
     "uuid": "^10.0.0"
   },
   "devDependencies": {
+    "@graphql-codegen/cli": "5.0.3",
+    "@graphql-codegen/typescript-resolvers": "4.3.0",
+    "@graphql-codegen/typescript": "4.1.0",
+    "@graphql-codegen/introspection": "4.0.3",
     "@types/cors": "^2.8.17",
     "@types/lodash": "^4.17.10",
     "@types/node": "^22.7.4",
     "@types/uuid": "^10.0.0",
-    "nodemon": "^3.0.1",
-    "oxlint": "^0.9.9",
     "tsx": "^4.19.1",
     "typescript": "^5.6.2"
   }

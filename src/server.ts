@@ -10,9 +10,9 @@ import { requiredFields } from './graphql/validators/required-fields.js';
 import { createComplexityLimitRule } from './graphql/validators/complexity-cost/index.js';
 import { ApolloServerPluginLandingPageDisabled } from "@apollo/server/plugin/disabled";
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
+import type { GraphQLContext } from './graphql/utils.js';
 
-
-import { typeDefs, resolvers } from './graphql/root.js';
+import { typeDefs, resolvers } from './graphql/index.js';
 import { errorMessageToJsonError, graphqlFormatError } from './graphql/error.js';
 
 // const { setupFirebase } = require("./shared/firebase/setup");
@@ -20,8 +20,7 @@ import { errorMessageToJsonError, graphqlFormatError } from './graphql/error.js'
 // const { User } = require('./shared/models');
 import { verifyToken } from "./shared/utils/authentication.js";
 
-
-const PORT = 3000;
+const PORT = 3010;
 const QUERY_MAX_DEPTH = 4;
 
 const corsOptions = {
@@ -71,6 +70,9 @@ async function startServer() {
     express.json(),
     expressMiddleware(server, {
       context: async ({ req, res }) => {
+        const context: GraphQLContext = {
+          
+        };
         // const decodeToken = verifyToken({ req, res });
 
         // // if token, return user
@@ -82,7 +84,7 @@ async function startServer() {
 
         // // if no token, return empty object
         // else {
-          return {};
+          return context;
         // }
       },
     }),

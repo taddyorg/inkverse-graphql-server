@@ -1,5 +1,6 @@
 import { Kind } from 'graphql';
-import _ from "lodash"
+import isNumber from 'lodash/isNumber.js';
+import get from 'lodash/get.js';
 import { ValidationError } from "../error.js";
 
 const objectMap = (obj: any, fn: any) =>
@@ -10,7 +11,6 @@ const objectMap = (obj: any, fn: any) =>
   )
 
 const cacheKeyForType: Record<string, string> = {
-  "Book": "id",
   "User": "id",
   "Documentation": "id",
   "ComicSeries": "uuid",
@@ -85,7 +85,7 @@ function getCacheFieldsForType({ type, key }: { type: any, key: string }) {
   let internalFields: Record<string, string> = {};  
 
   objectMap(type, (property: any) => {    
-    const returnType = _.get(property.type, 'ofType.name', property.type.name);
+    const returnType = get(property.type, 'ofType.name', property.type.name);
 
     if (cacheTypesSet.has(returnType)) {
       internalFields[property.name] = returnType;
@@ -177,7 +177,7 @@ function checkForFragmentPrimaryCacheKey(node: any, fragments: Record<string, an
   
   const selections = node.selectionSet.selections
 
-  const cacheType = _.get(node, 'typeCondition.name.value', null)
+  const cacheType = get(node, 'typeCondition.name.value', null)
   if (!cacheType) { return checkForSubQueries(selections, fragments, context, operationName, options) }
 
   const cacheKey = cacheKeyForType[cacheType]
