@@ -8,9 +8,7 @@ import type {
 } from '../shared/graphql/types.js';
 
 import type { ComicStoryModel } from '../shared/database/types.js';
-import * as ComicStoryFns from '../shared/models/comicstory.js';
-import * as ComicIssueFns from '../shared/models/comicissue.js';
-import * as ComicSeriesFns from '../shared/models/comicseries.js';
+import { ComicStory, ComicIssue, ComicSeries } from '../shared/models/index.js';
 
 const ComicStoryDefinitions = `
 " Comic Story Details "
@@ -60,7 +58,7 @@ const ComicStoryQueries: QueryResolvers<ComicStoryModel> = {
   async getComicStory(root, { uuid }, context: GraphQLContext): Promise<ComicStoryModel | null>{
     if (uuid) {
       const trimmedUuid = validateAndTrimUuid(uuid);
-      return await ComicStoryFns.getComicStoryByUuid(trimmedUuid);
+      return await ComicStory.getComicStoryByUuid(trimmedUuid);
     }else{
       return null;
     }
@@ -75,12 +73,12 @@ const ComicStoryFieldResolvers: ComicStoryResolvers<ComicStoryModel> = {
 
     async comicIssue({ issueUuid }: ComicStoryModel, args: any, context: GraphQLContext) {
       const trimmedIssueUuid = validateAndTrimUuid(issueUuid, 'issueUuid');
-      return await ComicIssueFns.getComicIssueByUuid(trimmedIssueUuid);
+      return await ComicIssue.getComicIssueByUuid(trimmedIssueUuid);
     },
 
     async comicSeries({ seriesUuid }: ComicStoryModel, args: any, context: GraphQLContext) {
       const trimmedSeriesUuid = validateAndTrimUuid(seriesUuid, 'seriesUuid');
-      return await ComicSeriesFns.getComicSeriesByUuid(trimmedSeriesUuid);
+      return await ComicSeries.getComicSeriesByUuid(trimmedSeriesUuid);
     },
   }
 }

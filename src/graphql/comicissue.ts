@@ -1,4 +1,4 @@
-import isNumber from 'lodash/isNumber.js';
+import { isNumber } from 'lodash-es';
 
 import { validateAndTrimUuid, UserInputError } from './error.js';
 import type { GraphQLContext } from './utils.js';
@@ -10,9 +10,7 @@ import type {
 import { SortOrder } from '../shared/graphql/types.js';
 
 import type { ComicIssueModel } from '../shared/database/types.js';
-import * as ComicIssueFns from '../shared/models/comicissue.js';
-import * as ComicStoryFns from '../shared/models/comicstory.js';
-import * as ComicSeriesFns from '../shared/models/comicseries.js';
+import { ComicIssue, ComicStory, ComicSeries } from '../shared/models/index.js';
 
 const ComicIssueDefinitions = `
 " Comic Issue Details "
@@ -103,7 +101,7 @@ const ComicIssueQueries: QueryResolvers<ComicIssueModel> = {
   async getComicIssue(root, { uuid }, context: GraphQLContext): Promise<ComicIssueModel | null> {
     if (uuid) {
       const trimmedUuid = validateAndTrimUuid(uuid);
-      return await ComicIssueFns.getComicIssueByUuid(trimmedUuid);
+      return await ComicIssue.getComicIssueByUuid(trimmedUuid);
     } else {
       return null;
     }
@@ -118,7 +116,7 @@ const ComicIssueQueries: QueryResolvers<ComicIssueModel> = {
     const safeSortOrder = sortOrder ?? SortOrder.Latest;
     const safeIncludeRemovedIssues = includeRemovedIssues ?? false;
 
-    return await ComicIssueFns.getIssuesForComicSeries(
+    return await ComicIssue.getComicIssuesForSeries(
       trimmedSeriesUuid,
       safeSortOrder,
       limitPerPage,
@@ -139,23 +137,23 @@ const ComicIssueFieldResolvers: ComicIssueResolvers<ComicIssueModel> = {
     },
 
     async stories({ uuid }: ComicIssueModel, input:{}, context: GraphQLContext) {
-      return await ComicStoryFns.getComicStoriesForIssue(uuid);
+      return await ComicStory.getComicStoriesForIssue(uuid);
     },
 
     async previewStoryImageUrls({ uuid }: ComicIssueModel, input:{}, context: GraphQLContext) {
-      const comicstories = await ComicStoryFns.getComicStoriesForIssue(uuid);
+      const comicstories = await ComicStory.getComicStoriesForIssue(uuid);
       return comicstories.map(story => story.storyImage?.base_url && story.storyImage?.story ? `${story.storyImage.base_url}${story.storyImage.story}` : null).filter(Boolean).slice(0, 5);
     },
 
     async comicSeries({ seriesUuid }: ComicIssueModel, input:{}, context: GraphQLContext) {
       const trimmedSeriesUuid = validateAndTrimUuid(seriesUuid, 'seriesUuid');
-      return await ComicSeriesFns.getComicSeriesByUuid(trimmedSeriesUuid);
+      return await ComicSeries.getComicSeriesByUuid(trimmedSeriesUuid);
     },
 
     async nextIssue({ seriesUuid, position }: ComicIssueModel, input:{}, context: GraphQLContext) {
       const trimmedSeriesUuid = validateAndTrimUuid(seriesUuid, 'seriesUuid');
       if (!isNumber(position)) { return null }
-      return await ComicIssueFns.getComicIssueForSeriesByPosition(trimmedSeriesUuid, position + 1);
+      return await ComicIssue.getComicIssueForSeriesByPosition(trimmedSeriesUuid, position + 1);
     },
   }
 }

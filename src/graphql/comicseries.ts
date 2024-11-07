@@ -1,4 +1,4 @@
-import isNumber from 'lodash/isNumber.js';
+import { isNumber } from 'lodash-es';
 
 import { validateAndTrimUuid, UserInputError } from './error.js';
 import type { GraphQLContext } from './utils.js';
@@ -11,9 +11,7 @@ import type {
 import { SortOrder, TaddyType } from '../shared/graphql/types.js';
 
 import type { ComicSeriesModel } from '../shared/database/types.js';
-import * as ComicSeriesFns from '../shared/models/comicseries.js';
-import * as ComicIssueFns from '../shared/models/comicissue.js';
-import * as CreatorFns from '../shared/models/creator.js';
+import { ComicSeries, ComicIssue, Creator } from '../shared/models/index.js';
 
 const ComicSeriesDefinitions = `
   " Comic Issue Details "
@@ -63,8 +61,11 @@ const ComicSeriesDefinitions = `
     " The language the comic series is in "
     language: Language
 
-    " Layout type of the comic series "
+    " Type of the comic series "
     seriesType: ComicSeriesType
+
+    " Layout type of the comic series "
+    layoutType: ComicSeriesLayoutType
 
     " Rating of the comic series "
     contentRating: ContentRating
@@ -117,11 +118,6 @@ const ComicSeriesDefinitions = `
     " The scopes for the exclusive content - e.g. 'patreon' "
     scopesForExclusiveContent: [String]
   }
-
-  " Type of comic series (just webtoon for now) "
-  enum ComicSeriesType {
-    WEBTOON
-  }
 `
 
 const ComicSeriesQueriesDefinitions = `
@@ -139,9 +135,9 @@ const ComicSeriesQueries: QueryResolvers<ComicSeriesModel> = {
   async getComicSeries(root, { uuid, shortUrl }, context: GraphQLContext){
     if (uuid) {
       const trimmedUuid = validateAndTrimUuid(uuid);
-      return await ComicSeriesFns.getComicSeriesByUuid(trimmedUuid);
+      return await ComicSeries.getComicSeriesByUuid(trimmedUuid);
     } else if (shortUrl) {
-      return await ComicSeriesFns.getComicSeriesByShortUrl(shortUrl);
+      return await ComicSeries.getComicSeriesByShortUrl(shortUrl);
     } else {
       return null;
     }
@@ -178,7 +174,7 @@ const ComicSeriesFieldResolvers: ComicSeriesResolvers<ComicSeriesModel> = {
 
       const offset = (page - 1) * limitPerPage;
 
-      return await ComicIssueFns.getIssuesForComicSeries(
+      return await ComicIssue.getComicIssuesForSeries(
         trimmedSeriesUuid,
         safeSortOrder,
         limitPerPage,
@@ -188,11 +184,11 @@ const ComicSeriesFieldResolvers: ComicSeriesResolvers<ComicSeriesModel> = {
     },
 
     async creators({ uuid }: ComicSeriesModel, _: Record<string, unknown>, context: GraphQLContext) {
-      return await CreatorFns.getCreatorsForContent(uuid, TaddyType.Comicseries);
+      return await Creator.getCreatorsForContent(uuid, TaddyType.Comicseries);
     },
 
     async issueCount({ uuid }: ComicSeriesModel, _: Record<string, unknown>, context: GraphQLContext) {
-      return await ComicSeriesFns.getIssueCount(uuid);
+      return await ComicSeries.getIssueCount(uuid);
     },
   },
 }

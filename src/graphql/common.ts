@@ -519,4 +519,13 @@ enum TaddyType {
   UNDER_REVISION
 }
 
+" Type of comic series "
+enum ComicSeriesType {
+  WEBTOON
+}
+
+" Layout types for comic series "
+enum ComicSeriesLayoutType {
+  VERTICAL_SCROLL_TOP_TO_BOTTOM
+}
 `

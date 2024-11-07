@@ -1,12 +1,11 @@
 import { validateAndTrimUuid } from './error.js';
 import type { GraphQLContext } from './utils.js';
 
-import { SortOrder, TaddyType } from '../shared/graphql/types.js';
+import { TaddyType } from '../shared/graphql/types.js';
 import type { CreatorContentResolvers, QueryResolvers } from '../shared/graphql/types.js';
 import type { CreatorContentModel } from '../shared/database/types.js';
 
-import * as CreatorContentFns from '../shared/models/creatorcontent.js';
-import * as ComicSeries from '../shared/models/comicseries.js';
+import { CreatorContent, ComicSeries } from '../shared/models/index.js';
 
 const CreatorContentDefinitions = `
 " CreatorContent Details "
@@ -15,7 +14,7 @@ type CreatorContent {
   id: ID
 
   " Unique identifier for this creatorcontent "
-  mergedUuid: ID
+  uuid: ID
 
   " A hash of all creatorcontent details "
   hash: String
@@ -44,39 +43,30 @@ type CreatorContent {
 `
 
 const CreatorContentQueriesDefinitions = `
-" Get details on a Creator "
+" Get details on a Creator Content "
 getCreatorContent(
-  " Get creatorcontent by its unique identifier (uuid) "
-  mergedUuid: ID
+  " Get creatorcontent by creator identifier "
+  creatorUuid: ID,
+
+  " Get creatorcontent by content identifier "
+  contentUuid: ID
 ):CreatorContent
 `
 
 const CreatorContentQueries: QueryResolvers<CreatorContentModel> = {
-  async getCreatorContent(root, { mergedUuid }, context): Promise<CreatorContentModel | null> {    
-    // if (mergedUuid){
-    //   const splitUuid = mergedUuid.split(':')
-    //   const [ creatorUuid, contentUuid ] = splitUuid;
-    //   if (!creatorUuid || !contentUuid) return null;
-    //   const safeCreatorUuid = validateAndTrimUuid(creatorUuid);
-    //   const safeSortOrder = SortOrder.Latest;
-    //   const content = await CreatorContentFns.getContentForCreator(safeCreatorUuid, safeSortOrder);
-    //   return content[0] ?? null;
-    // }else{
+  async getCreatorContent(root, { creatorUuid, contentUuid }, context): Promise<CreatorContentModel | null> {    
+    if (creatorUuid && contentUuid){
+      const safeCreatorUuid = validateAndTrimUuid(creatorUuid);
+      const safeContentUuid = validateAndTrimUuid(contentUuid);
+      return await CreatorContent.getCreatorContent(safeCreatorUuid, safeContentUuid);
+    }else{
       return null;
-    // }
+    }
   },
 }
 
 const CreatorContentFieldResolvers: CreatorContentResolvers<CreatorContentModel> = {
   CreatorContent: {
-    mergedUuid({ creatorUuid, contentUuid }: CreatorContentModel, _: any, context: GraphQLContext) {
-      return `${creatorUuid}:${contentUuid}`
-    },
-
-    contentType({ contentType }: CreatorContentModel, _: any, context: GraphQLContext) {
-      return contentType.toUpperCase();
-    },
-
     comicseries({ contentUuid, contentType }: CreatorContentModel, _: any, context: GraphQLContext) {
       if (contentType !== TaddyType.Comicseries) return null
       if (!contentUuid) return null

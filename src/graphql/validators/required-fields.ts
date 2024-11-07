@@ -1,6 +1,5 @@
 import { Kind } from 'graphql';
-import isNumber from 'lodash/isNumber.js';
-import get from 'lodash/get.js';
+import { get } from 'lodash-es';
 import { ValidationError } from "../error.js";
 
 const objectMap = (obj: any, fn: any) =>
@@ -17,6 +16,7 @@ const cacheKeyForType: Record<string, string> = {
   "ComicIssue": "uuid",
   "ComicStory": "uuid",
   "Creator": "uuid",
+  "CreatorContent": "uuid",
   "HostingProvider": "uuid",
   "OAuthDetails": "uuid",
   "SearchResults": "searchId",

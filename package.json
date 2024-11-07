@@ -7,8 +7,7 @@
     "build": "rm -rf dist && tsc",
     "dev": "tsx watch src/server.ts",
     "dev:build": "npm run build && npm run dev",
-    "start": "npm run build && node dist/server.js",
-    "codegen": "graphql-codegen --config src/shared/codegen.ts"
+    "start": "npm run build && node dist/server.js"
   },
   "type": "module",
   "author": "Inkverse",
@@ -22,20 +21,16 @@
     "express": "^4.21.1",
     "graphql": "^16.9.0",
     "graphql-tag": "^2.12.6",
-    "lodash": "^4.17.21",
+    "lodash-es": "^4.17.21",
     "notion-client": "^7.0.1",
     "uuid": "^11.0.2"
   },
   "devDependencies": {
-    "@graphql-codegen/cli": "5.0.3",
-    "@graphql-codegen/typescript-resolvers": "4.4.0",
-    "@graphql-codegen/typescript": "4.1.1",
-    "@graphql-codegen/introspection": "4.0.3",
     "@types/cors": "^2.8.17",
-    "@types/lodash": "^4.17.13",
+    "@types/lodash-es": "^4.17.12",
     "@types/node": "^22.9.0",
     "@types/uuid": "^10.0.0",
-    "tsx": "^4.19.1",
+    "tsx": "^4.19.2",
     "typescript": "^5.6.3"
   }
 }

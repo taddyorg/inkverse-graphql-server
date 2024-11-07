@@ -1,4 +1,4 @@
-import isNumber from 'lodash/isNumber.js';
+import { isNumber } from 'lodash-es';
 
 import { validateAndTrimUuid, UserInputError } from './error.js';
 import type { GraphQLContext } from './utils.js';
@@ -10,13 +10,13 @@ import type {
   CreatorLinkDetails,
   LinkDetails,
 } from '../shared/graphql/types.js';
-import { SortOrder } from '../shared/graphql/types.js';
+import { LinkType, SortOrder } from '../shared/graphql/types.js';
 
 import type { CreatorModel } from '../shared/database/types.js';
-import * as CreatorFns from '../shared/models/creator.js';
-import * as CreatorContentFns from '../shared/models/creatorcontent.js';
+import { Creator, CreatorContent } from '../shared/models/index.js';
 import { getBaseLinkForSchema } from '../public/links.js';
 import { arrayToObject } from '../public/utils.js';
+import { safeLinkType } from '../public/links.js';
 
 const CreatorDefinitions = `
   " Creator Details "
@@ -161,35 +161,35 @@ const CreatorQueries: QueryResolvers<CreatorModel> = {
   async getCreator(root: any, { uuid, shortUrl }, context: GraphQLContext) {
     if (uuid){
       const trimmedUuid = validateAndTrimUuid(uuid)
-      return await CreatorFns.getCreatorByUuid(trimmedUuid)
+      return await Creator.getCreatorByUuid(trimmedUuid)
     }else if (shortUrl){
-      return await CreatorFns.getCreatorByShortUrl(shortUrl);
+      return await Creator.getCreatorByShortUrl(shortUrl);
     }else{
       return null;
     }
   },
 
   async getCreatorLinksForSeries(root: any, { contentUuid, contentType }, context: GraphQLContext): Promise<CreatorLinkDetails[]> {
-    // const trimmedContentUuid = validateAndTrimUuid(contentUuid);
-    // const creators = await CreatorFns.getCreatorsForContent(trimmedContentUuid, contentType)
-    // const creatorsByUuid = arrayToObject(creators, "uuid");
-    // const allCreatorLinks = [];
-    // for (const creator in creatorsByUuid) {
-    //   const cc = creatorsByUuid[creator];
-    //   for (const link of cc.links) {
-    //     allCreatorLinks.push({
-    //       creatorUuid: creator,
-    //       type: link.type,
-    //       url: link.base_url 
-    //         ? link.type === 'MASTODON'
-    //           ? link.base_url + link.value
-    //           : getBaseLinkForSchema(link.type, link.value) + link.value
-    //         : link.value, 
-    //     })
-    //   }
-    // }
-    // return allCreatorLinks;
-    return [];
+    const trimmedContentUuid = validateAndTrimUuid(contentUuid);
+    const creators = await Creator.getCreatorsForContent(trimmedContentUuid, contentType)
+    const creatorsByUuid = arrayToObject(creators, "uuid");
+    const allCreatorLinks = [];
+    for (const creator in creatorsByUuid) {
+      const cc = creatorsByUuid[creator];
+      if (!cc || !cc.links || !cc.links.length) continue;
+      for (const link of cc.links) {
+        allCreatorLinks.push({
+          creatorUuid: creator,
+          type: link.type as LinkType,
+          url: link.base_url 
+            ? link.type === LinkType.Mastodon
+              ? link.base_url + link.value
+              : getBaseLinkForSchema(link.type as LinkType, link.value) + link.value
+            : link.value, 
+        })
+      }
+    }
+    return allCreatorLinks as CreatorLinkDetails[];
   }
 }
 
@@ -204,21 +204,20 @@ const CreatorFieldResolvers: CreatorResolvers<CreatorModel> = {
     },
 
     links({ links }: CreatorModel, _: any, context: GraphQLContext): LinkDetails[] {
-      // if (!links || !links.length) return []
+      if (!links || !links.length) return []
 
-      // const safeLinks = links.filter(link => allLinkTypesSet.has(link.type));
+      const safeLinks = links.filter(link => safeLinkType(link.type));
 
-      // return safeLinks.map(link => {
-      //   return {
-      //     type: link.type,
-      //     url: link.base_url 
-      //       ? link.type === 'MASTODON'
-      //         ? link.base_url + link.value
-      //         : getBaseLinkForSchema(link.type, link.value) + link.value
-      //       : link.value
-      //   }
-      // })
-      return [];
+      return safeLinks.map(link => {
+        return {
+          type: link.type as LinkType,
+          url: link.base_url 
+            ? link.type === LinkType.Mastodon
+              ? link.base_url + link.value
+              : getBaseLinkForSchema(link.type as LinkType, link.value) + link.value
+            : link.value
+        }
+      }) as LinkDetails[];
     },
 
     async content({ uuid }: CreatorModel, args: CreatorContentArgs, context: GraphQLContext) {
@@ -230,7 +229,7 @@ const CreatorFieldResolvers: CreatorResolvers<CreatorModel> = {
       const offset = (page - 1)*limitPerPage;
       const safeSortOrder = sortOrder ?? SortOrder.Latest;
 
-      return await CreatorContentFns.getContentForCreator(
+      return await CreatorContent.getContentForCreator(
         trimmedUuid, 
         safeSortOrder,
         offset,

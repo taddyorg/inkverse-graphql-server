@@ -1,5 +1,4 @@
 import { GraphQLError } from 'graphql';
-import type { UUID } from 'crypto';
 import type { Response } from 'express';
 import type { GraphQLFormattedError } from 'graphql';
 
@@ -51,7 +50,7 @@ function getPrettyCodeForGraphQLError(err: GraphQLError): string {
   }
 }
 
-export function validateAndTrimUuid(id: string | null, name = 'uuid'): UUID {
+export function validateAndTrimUuid(id: string | null, name = 'uuid'): string {
   if (!id) {
     throw new UserInputError(`${name} is null!`);
   }
@@ -62,7 +61,7 @@ export function validateAndTrimUuid(id: string | null, name = 'uuid'): UUID {
     throw new UserInputError(`${id} is not a valid ${name}`);
   }
 
-  return trimmedId as UUID;
+  return trimmedId;
 }
 
 class ApiKeyInvalidError extends GraphQLError {
