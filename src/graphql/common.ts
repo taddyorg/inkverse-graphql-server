@@ -507,6 +507,7 @@ enum TaddyType {
   COMICSERIES
   COMICISSUE
   CREATOR
+  CREATORCONTENT
 }
 
 " Status of Series "
