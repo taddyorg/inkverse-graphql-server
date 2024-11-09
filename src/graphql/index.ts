@@ -39,6 +39,12 @@ import {
   CreatorContentFieldResolvers 
 } from './creatorcontent.js';
 
+import {
+  DocsDefinitions,
+  DocsQueriesDefinitions,
+  DocsQueries,
+} from './docs.js';
+
 export const typeDefs = gql`#graphql
   ${CommonDefinitions}
   ${ComicSeriesDefinitions}
@@ -48,6 +54,7 @@ export const typeDefs = gql`#graphql
   ${LinkDefinitions}
   ${CreatorLinkDefintions}
   ${CreatorContentDefinitions}
+  ${DocsDefinitions}
 
   type Query {
     ${ComicSeriesQueriesDefinitions}
@@ -55,6 +62,7 @@ export const typeDefs = gql`#graphql
     ${ComicStoryQueriesDefinitions}
     ${CreatorQueriesDefinitions}
     ${CreatorContentQueriesDefinitions}
+    ${DocsQueriesDefinitions}
   }
 `;
 
@@ -66,6 +74,7 @@ export const resolvers: Resolvers = {
     ...ComicStoryQueries,
     ...CreatorQueries,
     ...CreatorContentQueries,
+    ...DocsQueries,
   },
   ...ComicSeriesFieldResolvers,
   ...ComicIssueFieldResolvers,
