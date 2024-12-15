@@ -14,7 +14,7 @@ import type { ComicSeriesModel } from '../shared/database/types.js';
 import { ComicSeries, ComicIssue, Creator } from '../shared/models/index.js';
 
 const ComicSeriesDefinitions = `
-  " Comic Issue Details "
+  " Comic Series Details "
   type ComicSeries {
     " Unique identifier for this comic "
     uuid: ID!

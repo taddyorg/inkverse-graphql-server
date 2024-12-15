@@ -1,6 +1,6 @@
 # Inkverse Server setup instructions
 
-This is the main server for Inkverse. It contains the GraphQL API.
+This is the main server for Inkverse, a GraphQL API.
 
 ## Steps to Setup
 
@@ -9,42 +9,14 @@ This is the main server for Inkverse. It contains the GraphQL API.
   - Install yarn (npm install -g yarn)
   - Download & install Docker for Mac: https://store.docker.com/editions/community/docker-ce-desktop-mac
 
-1. Setup private keys + passwords
+1. Create a .env file
 
-### Create .env file
+- Copy the `.env.copy` file to `.env` in this project's root. You will fill in these values in the next couple of steps.
 
-- Create a new `.env` file in this project's root. 
+2. This project contains 2 submodules: shared & public
 
-Add these values to the `.env` file:
-
-```
-DATABASE_URL=
-SENTRY_URL=
-PUBLIC_JWT=
-PRIVATE_JWT=
-```
-
-### For PUBLIC_JWT & PRIVATE_JWT
-
-- run the following code to create `jwt.key` (Don't add passphrase when asked). This will create a private key for signing JWT tokens.
-```
-ssh-keygen -t rsa -b 4096 -m PEM -f jwt.key
-```
-
-- run the following code to generate a `jwt.key.pub`. This will create a public key for verifying JWT tokens.
-```
-openssl rsa -in jwt.key -pubout -outform PEM -out jwt.key.pub
-```
-
-Update the `.env` file with the following values (you will need to remove newlines and replace them with \n so that it all one string and in one line):
-```
-PUBLIC_JWT=
-PRIVATE_JWT=
-```
-
-You can delete the `jwt.key` and `jwt.key.pub` files (after you've copied them to the `.env` file).
-
-2. This project contains submodules (a different internal repo)
+- shared: contains shared code for backend Inkverse repos. ex) CRUD for Database.
+- public: contains constants used on both frontend & backend.
 
 ```
 git submodule init
@@ -53,15 +25,8 @@ git submodule update
 
 to check that it installed properly
 ```
-cd shared
-ls // make sure it has files/folders inside here
-```
-
-The shared module contains 3rd party packages for it to work. Install them by running the following command:
-
-```
-cd shared
-yarn install
+ls src/shared // make sure it has files/folders inside here
+ls src/public // make sure it has files/folders inside here
 ```
 
 3. Setup databases
@@ -69,70 +34,93 @@ yarn install
 Inkverse's server requires the following databases:
 - Postgres (main database)
 
-We are going to use Docker to setup the databases
-
-#### FYI - Docker Coles notes:
-Docker has 2 main components: images & containers. A image is a definition of what you want to create and a container is an instance of the image.
-
-**-e** flag: pass in this value as an environment variable when you create the container.  
-**-v** flag: Volume mounting. ie) Maps the directory where it stores the db data in the container (/usr/share/elasticsearch/data) to a local directory of your choosing (~/esdata). You get 2 benefits with this: 1) If you ever create a new container in the future, you dont lose all the data you have created previously as the data keeps persisted in a folder on your local disk even if the container dies. 2) I can share my existing folder with you so that you have some starter data.  
-**-p**: Maps the port in your container to your localhost port. ie) When you go to localhost:9200 you will see a success message for having a running elastic search db.
-
-Some helpful docker commands:
-
-**docker ps** - Lists all running containers  
-**docker start <containerId>** - Starts a container, once you have it setup your containers you can start and stop them ex) after your computer restarts.  
-**docker stop <containerId>** - Stops a container  
-**docker ps -a** - Lists all containers, even stopped containers  
-**docker run** - You only need to run the `docker run` command once to install the container. After you have run the docker run command, you can just start/stop the containers going forward. ie) dont recreate new containers, but start and stop your exisiting containers with the changes / saved data going forward.
-
 ### To setup Postgres
 
-You need to think of a USERNAME, PASSWORD, and DB-NAME (any names you want). Pass it in as environment variables to the command below.
+Make up a USERNAME, PASSWORD, and DB-NAME for your local database. Pass these in as environment variables to the command below.
 
 ```
 docker run --name inkverse-postgres -e POSTGRES_USER=USERNAME -e POSTGRES_PASSWORD=PASSWORD -e POSTGRES_DB=DB-NAME -d  -v ~/docker-vms/inkverse-postgresdata:/var/lib/postgresql/data -p "5432:5432" postgres:13.16
 ```
+
+We will use Docker to run the Postgres database locally. 
+
+#### FYI - Docker Coles notes:
+Docker has 2 main components: images & containers. A image is a definition of what you want to create and a container is an instance of the image.
+
+You may have noticed a couple of flags in the command above:
+
+**-e**: pass a value as an environment variable when you create the container.  
+**-v**: Volume mounting. ie) Maps a directory in the container to a local directory of your choosing. This means whenever you restart your computer, you dont lose all the data you have created previously as the data keeps persisted in a folder on your local disk even if the container dies.
+**-p**: Maps the port in your container to your localhost port.
+
+Some helpful docker commands:
+
+**docker ps -a** - Lists all containers, even stopped containers  
+**docker run** - You only need to run the `docker run` command once to create a container. After you have run the docker run command, you can just start/stop the containers going forward.
+**docker start <containerId>** - Starts a container, once you have it setup your containers you can start and stop them ex) when your computer restarts.  
+**docker stop <containerId>** - Stops a container  
 
 Update the `.env` file in the follow format:
 ```
 DATABASE_URL=postgres://USERNAME:PASSWORD@localhost:5432/DB-NAME
 ```
 
-4. To setup AWS SQS Queues locally
+4. Setup AWS SQS Queues locally
 
 ```
-docker run -d --name inkverse-queues -p 4100:4100 admiralpiett/goaws
+docker run -d --name inkverse-queues -p 4102:4100 admiralpiett/goaws
 ```
 
-This is a local message queue system that micmics AWS SQS queues. We use queues to handle sending emails, push notifications, etc.
+This is a local message queue system that mimics AWS SQS queues. We use queues to handle sending emails, push notifications, etc.
 
 Everytime you restart the docker container (or your laptop) you will have to create the queues again and all messages in your queues will be deleted.
 
-5. Install packages for this project
+5. Setup JWT keys
+
+We need to generate a private & public key for signing & verifying JWT tokens. We use JWT tokens for user authentication. 
+
+- Run the following code to create a `jwt.key` file (Don't add passphrase when asked). This will create a private key that is used for signing JWT tokens.
+
+```
+ssh-keygen -t rsa -b 4096 -m PEM -f jwt.key
+```
+
+- Run the following code to generate a `jwt.key.pub` file. This will create a public key for verifying JWT tokens.
+
+```
+openssl rsa -in jwt.key -pubout -outform PEM -out jwt.key.pub
+```
+
+Update the `.env` file with the following values (you will need to remove newlines and replace them with \n so that the whole key is on one line):
+
+```
+PUBLIC_JWT=
+PRIVATE_JWT=
+```
+
+You can delete the `jwt.key` and `jwt.key.pub` files (after you've copied them to the `.env` file).
+
+6. Install packages for this project
 
 ```
 yarn install
 ```
 
-6. Run database migrations
+We use yarn workspaces to install packages for the whole project, including the shared modules.
+
+7. Run database migrations
 
 ```
-cd shared
 yarn run migrate
 ```
 
-You may run into an error where it says you cannot update a table because it has not been created yet. It is trying to run the migrations asyncronously. To fix this, run all the create table migrations first, then run the migrations again.
+You may run into an error where it states you cannot update a table because it has not exist yet. This is because the migrations are current not run in a specific order. 
 
-7. Run the server!
-
-```
-yarn run dev
-```
+To fix this, move all the update table migrations to another folder, then run migrate again. Next, move the update table migrations back to the original folder and run migrate again.
 
 8. Localhost vs inkverse.test
 
-We use custom localhost (inkverse.test) vs localhost, the benefit is that you dont mix up cookies and other brower data between localhost projects.
+We use custom localhost (inkverse.test) vs localhost, the benefit is that you dont mix up cookies and other brower data between different localhost projects.
 
 To set it up, add this to your hosts file, by `sudo vim /etc/hosts` on Mac/Linux.
 
@@ -142,9 +130,19 @@ To set it up, add this to your hosts file, by `sudo vim /etc/hosts` on Mac/Linux
 127.0.0.1               us-east-1.goaws.com
 ```
 
-(us-east-1.goaws.com is used by inkverse-queues, add that as well)
+(us-east-1.goaws.com is used by inkverse-queues, so add that as well)
+
+9. Run the server!
+
+```
+yarn run dev
+```
+
+Inkverse is now running on [inkverse.test:3010](http://inkverse.test:3010/).
 
 ---
+
+## Helpful commands
 
 If you ever need to start the containers (after a computer restart)
 
@@ -152,8 +150,16 @@ If you ever need to start the containers (after a computer restart)
 docker start inkverse-postgres && docker start inkverse-queues
 ```
 
-and if you ever need to stop the containers
+If you ever need to stop the containers
 
 ```
 docker stop inkverse-postgres && docker stop inkverse-queues
+```
+
+### Update GraphQL Types
+
+If you make changes to the GraphQL schema, run the following command to generate types.
+
+```
+yarn run codegen
 ```

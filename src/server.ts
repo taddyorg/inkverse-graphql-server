@@ -14,11 +14,7 @@ import type { GraphQLContext } from './graphql/utils.js';
 
 import { typeDefs, resolvers } from './graphql/index.js';
 import { errorMessageToJsonError, graphqlFormatError } from './graphql/error.js';
-
-// const { setupFirebase } = require("./shared/firebase/setup");
-// const { setUpLogger } = require('./shared/utils/errors');
-// const { User } = require('./shared/models');
-import { verifyToken } from "./shared/utils/authentication.js";
+import workerRouter from './routes/worker.js';
 
 const PORT = 3010;
 const QUERY_MAX_DEPTH = 4;
@@ -94,6 +90,8 @@ async function startServer() {
   // setUpLogger();
   // setUpClient();
 
+  app.use('/api/worker', workerRouter);
+
   app.get('/api', (req, res) => {
     res.send('😁')
   });
@@ -105,7 +103,6 @@ async function startServer() {
   app.use((error: any, req: any, res: any, next: any) => {
     return errorMessageToJsonError(res, error)
   });
-
 
   httpServer.listen({ port: PORT }, () => {
     console.log(`🚀 Server ready at http://localhost:${PORT}${graphqlPath}`);

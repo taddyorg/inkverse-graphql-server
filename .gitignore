@@ -1,9 +1,9 @@
+dist/
 node_modules
 .DS_Store
 .env
 .idea/
 .vscode/
-private/*
 yarn-error.log
-scripts/node_modules
-dist/
+src/scripts/node_modules
+src/shared/node_modules

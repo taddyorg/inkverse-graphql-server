@@ -1,5 +1,4 @@
-import { validateAndTrimUuid } from '../graphql/error.js';
-
+import { validateAndTrimUuid } from './error.js';
 import type { GraphQLContext } from './utils.js';
 
 import type { 

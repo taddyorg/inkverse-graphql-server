@@ -15,19 +15,13 @@ ADD package.json /tmp/package.json
 ADD yarn.lock /tmp/yarn.lock
 RUN cd /tmp && $HOME/.yarn/bin/yarn install
 
-# Install shared node_modules using Yarn
-ADD shared/package.json /tmp-shared/package.json
-ADD shared/yarn.lock /tmp-shared/yarn.lock
-RUN cd /tmp-shared && $HOME/.yarn/bin/yarn install
-
 COPY . /app
 WORKDIR /app
 
 RUN cp -a /tmp/node_modules /app/node_modules
-RUN cp -a /tmp-shared/node_modules /app/shared/node_modules
 
 ENV NODE_ENV=production
 
-EXPOSE 3000
+EXPOSE 3010
 
-CMD [ "npm", "run", "prod"]
+CMD [ "npm", "run", "start"]
