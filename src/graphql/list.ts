@@ -1,7 +1,7 @@
 import { UserInputError, validateAndTrimUuid } from './error.js';
 import type { GraphQLContext } from './utils.js';
-import { curatedListsData, type ListModel } from '../shared/utils/hardcoded.js';
-
+import { curatedListsData } from '../shared/utils/hardcoded.js';
+import { ListType } from '../shared/database/types.js';
 
 import type { 
   QueryResolvers, 
@@ -84,21 +84,16 @@ const ListQueriesDefinitions = `
 
 const ListQueries: QueryResolvers = {
   async getList(root: any, { id }: { id: string }, context: GraphQLContext) {
-    if (id) {
-      const list = curatedListsData[id];
-      if (!list) { return null; }
-      
-      if (list.type !== 'COMICSERIES') { return null; }
+    if (!id) { return null }
+    
+    const list = curatedListsData[id];
+    if (!list || list.type !== ListType.COMICSERIES) { return null; }
 
-      const comicSeries = await ComicSeries.getComicSeriesByUuids(list.uuids);
-
-      return {
-        ...list,
-        comicSeries,
-      }
-      
-    } else {
-      return null;
+    const comicSeries = await ComicSeries.getComicSeriesByUuids(list.uuids);
+    
+    return {
+      ...list,
+      comicSeries
     }
   },
 };

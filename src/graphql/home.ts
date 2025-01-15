@@ -2,7 +2,8 @@ import { isNumber, shuffle } from 'lodash-es';
 
 import { UserInputError } from './error.js';
 import type { GraphQLContext } from './utils.js';
-import { curatedListsData, featuredComicSeriesUuids, mostPopularComicSeriesUuids, type ListModel } from '../shared/utils/hardcoded.js';
+import { curatedListsData, featuredComicSeriesUuids, mostPopularComicSeriesUuids } from '../shared/utils/hardcoded.js';
+import type { ListModel } from '../shared/database/types.js';
 
 import type { 
   QueryResolvers, 
@@ -133,7 +134,7 @@ const HomeScreenQueries: QueryResolvers = {
 
     return {
       id: `curated-lists`,
-      lists: curatedLists,
+      lists: curatedLists
     };
   }
 };
