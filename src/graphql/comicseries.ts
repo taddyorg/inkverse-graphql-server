@@ -1,17 +1,16 @@
 import { isNumber } from 'lodash-es';
 
-import { validateAndTrimUuid, UserInputError } from './error.js';
+import { validateAndTrimUuid } from './error.js';
 import type { GraphQLContext } from './utils.js';
 
 import type { 
   QueryResolvers, 
   ComicSeriesResolvers,
-  ComicSeriesIssuesArgs,
 } from '../shared/graphql/types.js';
-import { SortOrder, TaddyType } from '../shared/graphql/types.js';
+import { TaddyType } from '../shared/graphql/types.js';
 
 import type { ComicSeriesModel } from '../shared/database/types.js';
-import { ComicSeries, ComicIssue, Creator } from '../shared/models/index.js';
+import { ComicSeries, Creator } from '../shared/models/index.js';
 
 const ComicSeriesDefinitions = `
   " Comic Series Details "
@@ -88,24 +87,6 @@ const ComicSeriesDefinitions = `
     " If the content has violated Taddy's distribution policies for illegal or harmful content it will be blocked from getting any updates "
     isBlocked: Boolean
 
-    " A list of issues for this comic series "
-    issues(
-      " (Optional) Returns issues based on SortOrder. Default is OLDEST (oldest issues first), another option is LATEST (newest issues first), and another option is SEARCH (pass in the property searchTerm) to filter for issues by title or description. "
-      sortOrder: SortOrder,
-
-      " (Optional) Taddy paginates the results returned. Default is 1, Max value allowed is 1000 "
-      page: Int,
-
-      " (Optional) Return up to this number of issues. Default is 10, Max value allowed is 25 results per page "
-      limitPerPage: Int,
-
-      " (Optional) Only to be used when sortOrder is SEARCH. Filters through the title & description of issues for the searchTerm "
-      searchTerm: String,
-
-      " (Optional) The option to show issues that were once on the RSS feed but have now been removed. Default is false "
-      includeRemovedIssues: Boolean,
-    ): [ComicIssue]
-
     " Creators of the comic series "
     creators: [Creator]
 
@@ -162,29 +143,8 @@ const ComicSeriesFieldResolvers: ComicSeriesResolvers<ComicSeriesModel> = {
       return thumbnailImage ? JSON.stringify(thumbnailImage) : null;
     },
 
-    async issues({ uuid }: ComicSeriesModel, args: ComicSeriesIssuesArgs, context: GraphQLContext) {
-      const { sortOrder, page = 1, limitPerPage = 10, searchTerm, includeRemovedIssues = false } = args;
-
-      if (!isNumber(page) || page < 1 || page > 1000) { throw new UserInputError('page must be between 1 and 1000') }
-      if (!isNumber(limitPerPage) || limitPerPage < 1 || limitPerPage > 25) { throw new UserInputError('limitPerPage must be between 1 and 25') }
-
-      const trimmedSeriesUuid = validateAndTrimUuid(uuid);
-      const safeSortOrder = sortOrder ?? SortOrder.Oldest;
-      const safeIncludeRemovedIssues = includeRemovedIssues ?? false;  
-
-      const offset = (page - 1) * limitPerPage;
-
-      return await ComicIssue.getComicIssuesForSeries(
-        trimmedSeriesUuid,
-        safeSortOrder,
-        limitPerPage,
-        offset,
-        safeIncludeRemovedIssues
-      );
-    },
-
     async creators({ uuid }: ComicSeriesModel, _: Record<string, unknown>, context: GraphQLContext) {
-      return await Creator.getCreatorsForContent(uuid, TaddyType.Comicseries);
+      return await Creator.getCreatorsForContent(uuid, TaddyType.COMICSERIES);
     },
 
     async issueCount({ uuid }: ComicSeriesModel, _: Record<string, unknown>, context: GraphQLContext) {

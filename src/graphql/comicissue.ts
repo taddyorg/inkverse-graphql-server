@@ -69,13 +69,24 @@ type ComicIssue {
   " The date when the issue (exclusive content) becomes available through the scope (epoch time in seconds)"
   dateExclusiveContentAvailable: Int
 }
+
+type ComicIssueForSeries {
+  " Series uuid "
+  seriesUuid: ID!
+
+  " The issues "
+  issues: [ComicIssue]
+}
 `
 
 const ComicIssueQueriesDefinitions = `
   " Get details on a comic issue"
   getComicIssue(
     " Unique identifier for a comic issue "
-    uuid: ID,
+    uuid: ID!,
+
+    " Unique identifier for a comic series this issue belongs to "
+    seriesUuid: ID!,
   ):ComicIssue
 
   " Get multiple issues for a comic series "
@@ -87,14 +98,14 @@ const ComicIssueQueriesDefinitions = `
     sortOrder: SortOrder,
 
     " The number of issues to return per page "
-    limitPerPage: Int!,
+    limitPerPage: Int,
 
     " The page number to return "
-    page: Int!,
+    page: Int,
 
     " If the removed issues should be included "
     includeRemovedIssues: Boolean,
-  ):[ComicIssue]!
+  ):ComicIssueForSeries
 `
 
 const ComicIssueQueries: QueryResolvers<ComicIssueModel> = {
@@ -107,22 +118,27 @@ const ComicIssueQueries: QueryResolvers<ComicIssueModel> = {
     }
   },
 
-  async getIssuesForComicSeries(root, { seriesUuid, sortOrder, limitPerPage = 10, page = 1, includeRemovedIssues = false }, context): Promise<ComicIssueModel[]> {
+  async getIssuesForComicSeries(root, { seriesUuid, sortOrder, limitPerPage = 10, page = 1, includeRemovedIssues = false }, context): Promise<{ seriesUuid: string; issues: ComicIssueModel[] | null }> {
     if (!isNumber(page) || page < 1 || page > 1000) { throw new UserInputError('page must be between 1 and 1000') }
-    if (!isNumber(limitPerPage) || limitPerPage < 1 || limitPerPage > 25) { throw new UserInputError('limitPerPage must be between 1 and 25') }
+    if (!isNumber(limitPerPage) || limitPerPage < 1 || limitPerPage > 1000) { throw new UserInputError('limitPerPage must be between 1 and 1000') }
 
     const trimmedSeriesUuid = validateAndTrimUuid(seriesUuid, 'seriesUuid');
     const offset = (page - 1) * limitPerPage;
-    const safeSortOrder = sortOrder ?? SortOrder.Latest;
+    const safeSortOrder = sortOrder ?? SortOrder.LATEST;
     const safeIncludeRemovedIssues = includeRemovedIssues ?? false;
 
-    return await ComicIssue.getComicIssuesForSeries(
+    const issues = await ComicIssue.getComicIssuesForSeries(
       trimmedSeriesUuid,
       safeSortOrder,
       limitPerPage,
       offset,
       safeIncludeRemovedIssues,
     );
+
+    return {
+      seriesUuid: trimmedSeriesUuid,
+      issues,
+    };
   },
 }
 

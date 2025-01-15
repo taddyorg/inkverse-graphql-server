@@ -13,8 +13,9 @@ This is the main server for Inkverse, a GraphQL API.
 
 - Copy the `.env.copy` file to `.env` in this project's root. You will fill in these values in the next couple of steps.
 
-2. This project contains 2 submodules: shared & public
+2. Setup submodules
 
+This project contains 2 submodules: shared & public:
 - shared: contains shared code for backend Inkverse repos. ex) CRUD for Database.
 - public: contains constants used on both frontend & backend.
 
@@ -42,7 +43,14 @@ Make up a USERNAME, PASSWORD, and DB-NAME for your local database. Pass these in
 docker run --name inkverse-postgres -e POSTGRES_USER=USERNAME -e POSTGRES_PASSWORD=PASSWORD -e POSTGRES_DB=DB-NAME -d  -v ~/docker-vms/inkverse-postgresdata:/var/lib/postgresql/data -p "5432:5432" postgres:13.16
 ```
 
-We will use Docker to run the Postgres database locally. 
+Update the `.env` file in the following format:
+```
+DATABASE_USERNAME=USERNAME
+DATABASE_PASSWORD=PASSWORD
+DATABASE_NAME=DB-NAME
+DATABASE_ENDPOINT=localhost
+DATABASE_PORT=5432
+```
 
 #### FYI - Docker Coles notes:
 Docker has 2 main components: images & containers. A image is a definition of what you want to create and a container is an instance of the image.
@@ -58,12 +66,7 @@ Some helpful docker commands:
 **docker ps -a** - Lists all containers, even stopped containers  
 **docker run** - You only need to run the `docker run` command once to create a container. After you have run the docker run command, you can just start/stop the containers going forward.
 **docker start <containerId>** - Starts a container, once you have it setup your containers you can start and stop them ex) when your computer restarts.  
-**docker stop <containerId>** - Stops a container  
-
-Update the `.env` file in the follow format:
-```
-DATABASE_URL=postgres://USERNAME:PASSWORD@localhost:5432/DB-NAME
-```
+**docker stop <containerId>** - Stops a container
 
 4. Setup AWS SQS Queues locally
 

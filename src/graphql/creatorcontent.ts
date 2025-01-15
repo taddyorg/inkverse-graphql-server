@@ -10,8 +10,8 @@ import { CreatorContent, ComicSeries } from '../shared/models/index.js';
 const CreatorContentDefinitions = `
 " CreatorContent Details "
 type CreatorContent {
-  " (Old) Unique identifier for this creatorcontent "
-  id: ID
+  " Unique identifier for this creatorcontent "
+  id: ID @deprecated(reason: "Use uuid instead")
 
   " Unique identifier for this creatorcontent "
   uuid: ID
@@ -68,7 +68,7 @@ const CreatorContentQueries: QueryResolvers<CreatorContentModel> = {
 const CreatorContentFieldResolvers: CreatorContentResolvers<CreatorContentModel> = {
   CreatorContent: {
     comicseries({ contentUuid, contentType }: CreatorContentModel, _: any, context: GraphQLContext) {
-      if (contentType !== TaddyType.Comicseries) return null
+      if (contentType !== TaddyType.COMICSERIES) return null
       if (!contentUuid) return null
 
       return ComicSeries.getComicSeriesByUuid(contentUuid)

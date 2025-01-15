@@ -44,11 +44,14 @@ async function startServer() {
     persistedQueries: false,
     validationRules: [
       depthLimit(QUERY_MAX_DEPTH) as ValidationRule,
-      createComplexityLimitRule(4000, {
+      createComplexityLimitRule(5000, {
         scalarCost: 1,
         objectCost: 18, 
         listFactor: 12,
         introspectionListFactor: 1,
+        // onCost: (cost: number) => {
+        //   console.log('cost', cost);
+        // }
       } as any) as ValidationRule,
       requiredFields() as ValidationRule,
     ],

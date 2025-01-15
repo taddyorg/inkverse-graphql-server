@@ -1,6 +1,6 @@
 import express, { Router, type NextFunction, type Request, type Response } from 'express';
 import { getSafeError } from '../shared/utils/errors.js';
-import { QUEUE_NAMES, sendMessage } from '../shared/queues/utils.js';
+import { QUEUE_NAMES, sendMessage, INKVERSE_HIGH_PRIORITY_TYPE } from '../shared/queues/utils.js';
 
 const router = Router();
 
@@ -21,14 +21,19 @@ router.post('/process-taddy-webhook', async (req: Request, res: Response, next: 
         res.status(401).json({ error: 'Invalid webhook secret' });
         return;
       }
-  
+
+      const body = {
+        ...req.body,
+        type: INKVERSE_HIGH_PRIORITY_TYPE.PROCESS_TADDY_WEBHOOK
+      };
+
       //send to sqs
-      await sendMessage(QUEUE_NAMES.INKVERSE_HIGH_PRIORITY, req.body);
-  
+      await sendMessage(QUEUE_NAMES.INKVERSE_HIGH_PRIORITY, body);
+
       res.status(200).send('OK')
     } catch(error) {
       next(getSafeError(error, safeErrorMessage));
     }
-  });
+});
 
 export default router;

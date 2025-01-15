@@ -21,7 +21,9 @@ const cacheKeyForType: Record<string, string> = {
   "OAuthDetails": "uuid",
   "SearchResults": "searchId",
   "SearchQueryResponseInfo": "searchId",
-  "SearchQueryResponseInfoDetails": "searchId"
+  "SearchQueryResponseInfoDetails": "searchId",
+  "HomeScreenComicSeries": "id",
+  "ComicIssueForSeries": "seriesUuid"
 }
 
 const cacheTypesSet = new Set(Object.keys(cacheKeyForType));

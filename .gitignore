@@ -5,5 +5,4 @@ node_modules
 .idea/
 .vscode/
 yarn-error.log
-src/scripts/node_modules
 src/shared/node_modules

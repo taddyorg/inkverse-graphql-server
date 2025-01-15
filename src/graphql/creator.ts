@@ -158,7 +158,7 @@ type CreatorLinkDetails {
 `
 
 const CreatorQueries: QueryResolvers<CreatorModel> = {
-  async getCreator(root: any, { uuid, shortUrl }, context: GraphQLContext) {
+  async getCreator(root: any, { uuid, shortUrl }, context: GraphQLContext){
     if (uuid){
       const trimmedUuid = validateAndTrimUuid(uuid)
       return await Creator.getCreatorByUuid(trimmedUuid)
@@ -182,7 +182,7 @@ const CreatorQueries: QueryResolvers<CreatorModel> = {
           creatorUuid: creator,
           type: link.type as LinkType,
           url: link.base_url 
-            ? link.type === LinkType.Mastodon
+            ? link.type === LinkType.MASTODON
               ? link.base_url + link.value
               : getBaseLinkForSchema(link.type as LinkType, link.value) + link.value
             : link.value, 
@@ -212,7 +212,7 @@ const CreatorFieldResolvers: CreatorResolvers<CreatorModel> = {
         return {
           type: link.type as LinkType,
           url: link.base_url 
-            ? link.type === LinkType.Mastodon
+            ? link.type === LinkType.MASTODON
               ? link.base_url + link.value
               : getBaseLinkForSchema(link.type as LinkType, link.value) + link.value
             : link.value
@@ -227,7 +227,7 @@ const CreatorFieldResolvers: CreatorResolvers<CreatorModel> = {
 
       const trimmedUuid = validateAndTrimUuid(uuid);
       const offset = (page - 1)*limitPerPage;
-      const safeSortOrder = sortOrder ?? SortOrder.Latest;
+      const safeSortOrder = sortOrder ?? SortOrder.LATEST;
 
       return await CreatorContent.getContentForCreator(
         trimmedUuid, 

@@ -45,6 +45,18 @@ import {
   DocsQueries,
 } from './docs.js';
 
+import {
+  HomeScreenDefinitions,
+  HomeScreenQueriesDefinitions,
+  HomeScreenQueries,
+} from './home.js';
+
+import {
+  ListDefinitions,
+  ListQueriesDefinitions,
+  ListQueries,
+} from './list.js';
+
 export const typeDefs = gql`#graphql
   ${CommonDefinitions}
   ${ComicSeriesDefinitions}
@@ -55,6 +67,8 @@ export const typeDefs = gql`#graphql
   ${CreatorLinkDefintions}
   ${CreatorContentDefinitions}
   ${DocsDefinitions}
+  ${HomeScreenDefinitions}
+  ${ListDefinitions}
 
   type Query {
     ${ComicSeriesQueriesDefinitions}
@@ -63,6 +77,8 @@ export const typeDefs = gql`#graphql
     ${CreatorQueriesDefinitions}
     ${CreatorContentQueriesDefinitions}
     ${DocsQueriesDefinitions}
+    ${HomeScreenQueriesDefinitions}
+    ${ListQueriesDefinitions}
   }
 `;
 
@@ -75,6 +91,8 @@ export const resolvers: Resolvers = {
     ...CreatorQueries,
     ...CreatorContentQueries,
     ...DocsQueries,
+    ...HomeScreenQueries,
+    ...ListQueries,
   },
   ...ComicSeriesFieldResolvers,
   ...ComicIssueFieldResolvers,

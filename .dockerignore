@@ -1,7 +1,6 @@
 copilot/
 dist/
 node_modules/
-src/scripts/node_modules
 src/shared/node_modules
 .DS_Store
 .env
