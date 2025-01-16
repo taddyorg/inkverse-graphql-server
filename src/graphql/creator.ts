@@ -10,10 +10,10 @@ import type {
   CreatorLinkDetails,
   LinkDetails,
 } from '../shared/graphql/types.js';
-import { LinkType, SortOrder } from '../shared/graphql/types.js';
+import { LinkType, SortOrder, TaddyType } from '../shared/graphql/types.js';
 
-import type { CreatorModel } from '../shared/database/types.js';
-import { Creator, CreatorContent } from '../shared/models/index.js';
+import type { ComicSeriesModel, CreatorModel } from '../shared/database/types.js';
+import { ComicSeries, Creator, CreatorContent } from '../shared/models/index.js';
 import { getBaseLinkForSchema } from '../public/links.js';
 import { arrayToObject } from '../public/utils.js';
 import { safeLinkType } from '../public/links.js';
@@ -57,6 +57,9 @@ const CreatorDefinitions = `
     limitPerPage: Int
   ): [CreatorContent]
 
+  " Comics for the creator "
+  comics: [ComicSeries]
+
   " Tags for the creator "
   tags: [String]
 
@@ -95,11 +98,8 @@ getCreator(
 
 " Get efficient links for creators of content "
 getCreatorLinksForSeries(
-  " Get Creator Links by content unique identifier (uuid) "
-  contentUuid: ID!,
-
-  " The content type queried "
-  contentType: TaddyType!
+  " The uuid of the series "
+  seriesUuid: ID!
 ):[CreatorLinkDetails]
 `
 
@@ -169,9 +169,9 @@ const CreatorQueries: QueryResolvers<CreatorModel> = {
     }
   },
 
-  async getCreatorLinksForSeries(root: any, { contentUuid, contentType }, context: GraphQLContext): Promise<CreatorLinkDetails[]> {
-    const trimmedContentUuid = validateAndTrimUuid(contentUuid);
-    const creators = await Creator.getCreatorsForContent(trimmedContentUuid, contentType)
+  async getCreatorLinksForSeries(root: any, { seriesUuid }, context: GraphQLContext): Promise<CreatorLinkDetails[]> {
+    const trimmedSeriesUuid = validateAndTrimUuid(seriesUuid);
+    const creators = await Creator.getCreatorsForContent(trimmedSeriesUuid, TaddyType.COMICSERIES)
     const creatorsByUuid = arrayToObject(creators, "uuid");
     const allCreatorLinks = [];
     for (const creator in creatorsByUuid) {
@@ -236,6 +236,15 @@ const CreatorFieldResolvers: CreatorResolvers<CreatorModel> = {
         limitPerPage 
       )
     },
+
+    async comics({ uuid }: CreatorModel, _: any, context: GraphQLContext): Promise<ComicSeriesModel[]> {
+      const trimmedUuid = validateAndTrimUuid(uuid);
+      const content = await CreatorContent.getContentForCreatorAndType(trimmedUuid, TaddyType.COMICSERIES)
+      const comicSeriesUuids = content.map(c => c.contentUuid)
+      const comicsOutOfOrder = await ComicSeries.getComicSeriesByUuids(comicSeriesUuids)
+      const comicsObj = arrayToObject(comicsOutOfOrder, "uuid");
+      return comicSeriesUuids.map(uuid => comicsObj[uuid]).filter(c => c !== undefined)
+    }
   }
 }
 
