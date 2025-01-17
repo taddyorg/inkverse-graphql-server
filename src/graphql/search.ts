@@ -28,14 +28,15 @@ searchForTerm(
   term: String
   page: Int
   limitPerPage: Int
+  filterForTypes: [String]
 ): SearchResults
 `
 
 const SearchQueries: QueryResolvers = {
   async searchForTerm(root: any, args: QuerySearchForTermArgs, context: GraphQLContext) {
-    const { term = '', page = 1, limitPerPage = 25 } = args;
+    const { term = '', page = 1, limitPerPage = 25, filterForTypes = ["COMICSERIES"] } = args;
 
-    const variables = { term, page, limitPerPage, filterForTypes: ["COMICSERIES"] };
+    const variables = { term, page, limitPerPage, filterForTypes };
     const query = SEARCH_FOR_TERM_QUERY;
 
     try {
