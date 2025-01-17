@@ -57,6 +57,13 @@ import {
   ListQueries,
 } from './list.js';
 
+import {
+  SearchDefinitions,
+  SearchQueriesDefinitions,
+  SearchQueries,
+  SearchResolvers
+} from './search.js';
+
 export const typeDefs = gql`#graphql
   ${CommonDefinitions}
   ${ComicSeriesDefinitions}
@@ -69,6 +76,7 @@ export const typeDefs = gql`#graphql
   ${DocsDefinitions}
   ${HomeScreenDefinitions}
   ${ListDefinitions}
+  ${SearchDefinitions}
 
   type Query {
     ${ComicSeriesQueriesDefinitions}
@@ -79,6 +87,7 @@ export const typeDefs = gql`#graphql
     ${DocsQueriesDefinitions}
     ${HomeScreenQueriesDefinitions}
     ${ListQueriesDefinitions}
+    ${SearchQueriesDefinitions}
   }
 `;
 
@@ -93,10 +102,12 @@ export const resolvers: Resolvers = {
     ...DocsQueries,
     ...HomeScreenQueries,
     ...ListQueries,
+    ...SearchQueries,
   },
   ...ComicSeriesFieldResolvers,
   ...ComicIssueFieldResolvers,
   ...ComicStoryFieldResolvers,
   ...CreatorFieldResolvers,
   ...CreatorContentFieldResolvers,
+  ...SearchResolvers,
 };
