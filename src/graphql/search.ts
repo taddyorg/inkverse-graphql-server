@@ -33,7 +33,7 @@ search(
 
 const SearchQueries: QueryResolvers = {
   async search(root: any, args: QuerySearchArgs, context: GraphQLContext) {
-    const { term = '', page = 1, limitPerPage = 25, filterForTypes = ["COMICSERIES"], filterForTags = [], filterForGenres = [] } = args;
+    const { term = '', page = 1, limitPerPage = 25, filterForTypes = ["COMICSERIES"], filterForTags = null, filterForGenres = null } = args;
 
     const variables = { term, page, limitPerPage, filterForTypes, filterForTags, filterForGenres };
     const query = SEARCH_QUERY;
