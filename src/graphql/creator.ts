@@ -22,7 +22,7 @@ const CreatorDefinitions = `
   " Creator Details "
   type Creator {
   " Unique identifier for this creator "
-  uuid: ID
+  uuid: ID!
 
   " Date when the creator feed was published (Epoch time in seconds) "
   datePublished: Int

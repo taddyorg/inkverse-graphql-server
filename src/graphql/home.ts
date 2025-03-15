@@ -131,10 +131,11 @@ const HomeScreenQueries: QueryResolvers = {
     if (!isNumber(limitPerPage) || limitPerPage < 1 || limitPerPage > 25) { throw new UserInputError('limitPerPage must be between 1 and 20') }
 
     const curatedLists = [curatedListsData["4"], curatedListsData["2"], curatedListsData["3"], curatedListsData["8"], curatedListsData["10"], curatedListsData["5"], curatedListsData["6"], curatedListsData["9"], curatedListsData["7"] ].filter((list): list is ListModel => list !== undefined);
+    const shuffledCuratedLists = shuffle(curatedLists);
 
     return {
       id: `curated-lists`,
-      lists: curatedLists
+      lists: shuffledCuratedLists,
     };
   }
 };

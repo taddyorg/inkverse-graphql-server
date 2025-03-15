@@ -13,7 +13,7 @@
     "dev": "tsx watch src/server.ts",
     "dev:build": "yarn build && yarn dev",
     "start": "yarn build && node dist/src/server.js",
-    "codegen": "graphql-codegen --config src/shared/graphql/codegen.ts",
+    "graphql-codegen": "graphql-codegen --config src/shared/graphql/codegen.ts",
     "migrate": "tsx src/shared/node_modules/.bin/knex --knexfile src/shared/database/config.ts migrate:latest",
     "migrate:rollback": "tsx src/shared/database/list-last-batch-migrations.ts",
     "migrate:list": "tsx src/shared/node_modules/.bin/knex --knexfile src/shared/database/config.ts migrate:list"

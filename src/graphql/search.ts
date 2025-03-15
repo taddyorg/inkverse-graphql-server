@@ -1,11 +1,8 @@
 import type { GraphQLContext } from './utils.js';
-import { SEARCH_FOR_TERM_QUERY, taddyGraphqlRequest } from '../shared/taddy/index.js';
+import { SEARCH_QUERY, taddyGraphqlRequest } from '../shared/taddy/index.js';
 import { ComicSeries } from '../shared/models/index.js';
 
-import type { 
-  QueryResolvers,
-  QuerySearchForTermArgs,
-} from '../shared/graphql/types.js';
+import type { QueryResolvers, QuerySearchArgs } from '../shared/graphql/types.js';
 import { arrayToObject } from '@/public/utils.js';
 
 const SearchDefinitions = `
@@ -24,27 +21,29 @@ type SearchResults {
 
 const SearchQueriesDefinitions = `
 " Search for a term "
-searchForTerm(
+search(
   term: String
   page: Int
   limitPerPage: Int
   filterForTypes: [String]
+  filterForTags: [String]
+  filterForGenres: [Genre]
 ): SearchResults
 `
 
 const SearchQueries: QueryResolvers = {
-  async searchForTerm(root: any, args: QuerySearchForTermArgs, context: GraphQLContext) {
-    const { term = '', page = 1, limitPerPage = 25, filterForTypes = ["COMICSERIES"] } = args;
+  async search(root: any, args: QuerySearchArgs, context: GraphQLContext) {
+    const { term = '', page = 1, limitPerPage = 25, filterForTypes = ["COMICSERIES"], filterForTags = [], filterForGenres = [] } = args;
 
-    const variables = { term, page, limitPerPage, filterForTypes };
-    const query = SEARCH_FOR_TERM_QUERY;
+    const variables = { term, page, limitPerPage, filterForTypes, filterForTags, filterForGenres };
+    const query = SEARCH_QUERY;
 
     try {
       const data = await taddyGraphqlRequest(query, variables);
       if (!data) { return null; }
-      return data.searchForTerm;
+      return data.search;
     } catch (e) {
-      throw new Error(`Error in searchForTerm query: ${e}`);
+      throw new Error(`Error in search query: ${e}`);
     }
   }
 };
