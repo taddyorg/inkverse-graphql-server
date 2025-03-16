@@ -40,8 +40,7 @@ const SearchQueries: QueryResolvers = {
 
     try {
       const data = await taddyGraphqlRequest(query, variables);
-      if (!data) { return null; }
-      return data.search;
+      return data?.search;
     } catch (e) {
       throw new Error(`Error in search query: ${e}`);
     }
