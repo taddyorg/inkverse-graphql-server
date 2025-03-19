@@ -3,7 +3,7 @@ import { SEARCH_QUERY, taddyGraphqlRequest } from '../shared/taddy/index.js';
 import { ComicSeries } from '../shared/models/index.js';
 
 import type { QueryResolvers, QuerySearchArgs } from '../shared/graphql/types.js';
-import { arrayToObject } from '@/public/utils.js';
+import { arrayToObject } from '../public/utils.js';
 
 const SearchDefinitions = `
 " A search result "
