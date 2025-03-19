@@ -3,10 +3,11 @@
   "private": true,
   "workspaces": [
     ".",
+    "src/public",
     "src/shared"
   ],
   "version": "1.0.0",
-  "main": "dist/server.js",
+  "main": "dist/src/server.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "rm -rf dist && tsc",
