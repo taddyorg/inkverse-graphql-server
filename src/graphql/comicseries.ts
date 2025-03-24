@@ -8,7 +8,7 @@ import type {
   ComicSeriesResolvers,
   MutationResolvers,
 } from '../shared/graphql/types.js';
-import { TaddyType } from '../shared/graphql/types.js';
+import { SeriesStatus, TaddyType } from '../shared/graphql/types.js';
 
 import type { ComicSeriesModel } from '../shared/database/types.js';
 import { ComicSeries, Creator } from '../shared/models/index.js';
@@ -159,6 +159,14 @@ const ComicSeriesMutations: MutationResolvers<GraphQLContext> = {
 
 const ComicSeriesFieldResolvers: ComicSeriesResolvers<ComicSeriesModel> = {
   ComicSeries: {
+    status({ status }: ComicSeriesModel, input:{}, context: GraphQLContext) {
+      if (!status) {
+        return SeriesStatus.ONGOING;
+      }
+
+      return status;
+    },
+
     sssUrl({ sssUrl, isBlocked }: ComicSeriesModel, input:{}, context: GraphQLContext) {
       return isBlocked ? null : sssUrl;
     },
