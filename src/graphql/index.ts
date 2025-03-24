@@ -6,7 +6,9 @@ import {
   ComicSeriesDefinitions, 
   ComicSeriesQueriesDefinitions, 
   ComicSeriesQueries, 
-  ComicSeriesFieldResolvers 
+  ComicSeriesFieldResolvers,
+  ComicSeriesMutationsDefinitions,
+  ComicSeriesMutations,
 } from './comicseries.js';
 
 import { 
@@ -89,6 +91,10 @@ export const typeDefs = gql`#graphql
     ${ListQueriesDefinitions}
     ${SearchQueriesDefinitions}
   }
+
+  type Mutation {
+    ${ComicSeriesMutationsDefinitions}
+  }
 `;
 
 // Resolvers define the technique for fetching types
@@ -103,6 +109,9 @@ export const resolvers: Resolvers = {
     ...HomeScreenQueries,
     ...ListQueries,
     ...SearchQueries,
+  },
+  Mutation: {
+    ...ComicSeriesMutations,
   },
   ...ComicSeriesFieldResolvers,
   ...ComicIssueFieldResolvers,

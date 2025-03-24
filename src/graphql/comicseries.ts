@@ -6,11 +6,13 @@ import type { GraphQLContext } from './utils.js';
 import type { 
   QueryResolvers, 
   ComicSeriesResolvers,
+  MutationResolvers,
 } from '../shared/graphql/types.js';
 import { TaddyType } from '../shared/graphql/types.js';
 
 import type { ComicSeriesModel } from '../shared/database/types.js';
 import { ComicSeries, Creator } from '../shared/models/index.js';
+import { sendSlackNotification } from '@/shared/messaging/slack.js';
 
 const ComicSeriesDefinitions = `
   " Comic Series Details "
@@ -60,6 +62,9 @@ const ComicSeriesDefinitions = `
     " The language the comic series is in "
     language: Language
 
+    " The status of the comic series "
+    status: SeriesStatus
+
     " Type of the comic series "
     seriesType: ComicSeriesType
 
@@ -101,6 +106,17 @@ const ComicSeriesDefinitions = `
   }
 `
 
+const ComicSeriesMutationsDefinitions = `
+  " Report a comic series "
+  reportComicSeries(
+    " The uuid of the comic series to report "
+    uuid: ID!
+
+    " The type of report to send "
+    reportType: String
+  ): Boolean
+`
+
 const ComicSeriesQueriesDefinitions = `
   " Get details on a Comic Series "
   getComicSeries(
@@ -122,6 +138,22 @@ const ComicSeriesQueries: QueryResolvers<ComicSeriesModel> = {
     } else {
       return null;
     }
+  },
+};
+
+const ComicSeriesMutations: MutationResolvers<GraphQLContext> = {
+  async reportComicSeries(root, { uuid, reportType }, context: GraphQLContext) {
+    const trimmedUuid = validateAndTrimUuid(uuid);
+    const comicSeries = await ComicSeries.getComicSeriesByUuid(trimmedUuid);
+    if (!comicSeries) {
+      throw new Error('inside reportComicSeries() - Comic series not found');
+    }
+
+    await sendSlackNotification('general', {
+      text: `*COMIC SERIES REPORTED*\n:warning: *Name:* ${comicSeries.name}\n*UUID:* ${trimmedUuid}\n*Report Type:* ${reportType}`,
+    });
+
+    return true;
   },
 };
 
@@ -156,6 +188,8 @@ const ComicSeriesFieldResolvers: ComicSeriesResolvers<ComicSeriesModel> = {
 export {
   ComicSeriesDefinitions,
   ComicSeriesQueriesDefinitions,
+  ComicSeriesMutationsDefinitions,
   ComicSeriesQueries,
+  ComicSeriesMutations,
   ComicSeriesFieldResolvers,
 }
