@@ -84,7 +84,7 @@ const HomeScreenQueries: QueryResolvers = {
 
     const comicSeries = await ComicSeries.getRecentlyAddedComicSeries(page, limitPerPage);
     return {
-      id: `recently-added-comicseries`,
+      id: 'recently-added',
       comicSeries,
     };
   },
@@ -95,7 +95,7 @@ const HomeScreenQueries: QueryResolvers = {
 
     const comicSeries = await ComicSeries.getRecentlyUpdatedComicSeries(page, limitPerPage);
     return {
-      id: `recently-updated-comicseries`,
+      id: 'recently-updated',
       comicSeries,
     };
   },
@@ -109,7 +109,7 @@ const HomeScreenQueries: QueryResolvers = {
     const shuffledComicSeries = shuffle(comicSeries);
 
     return {
-      id: `most-popular-comicseries`,
+      id: 'most-popular',
       comicSeries: shuffledComicSeries,
     };
   },
@@ -121,7 +121,7 @@ const HomeScreenQueries: QueryResolvers = {
     const comicSeries = await ComicSeries.getComicSeriesByUuids(featuredComicSeriesUuids);
 
     return {
-      id: `featured-comicseries`,
+      id: 'featured-comics',
       comicSeries,
     };
   },
@@ -134,7 +134,7 @@ const HomeScreenQueries: QueryResolvers = {
     const shuffledCuratedLists = shuffle(curatedLists);
 
     return {
-      id: `curated-lists`,
+      id: 'curated-lists',
       lists: shuffledCuratedLists,
     };
   }
