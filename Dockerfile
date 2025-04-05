@@ -10,15 +10,18 @@ RUN apt-get install apt-transport-https ca-certificates -y
 # Install yarn from the local .tgz
 RUN curl -o- -L https://yarnpkg.com/install.sh | bash
 
-# Install root node_modules using Yarn
-ADD package.json /tmp/package.json
-ADD yarn.lock /tmp/yarn.lock
-RUN cd /tmp && $HOME/.yarn/bin/yarn install
+# Copy package files first for better layer caching
+COPY package.json yarn.lock /app/
+COPY src/public/package.json /app/src/public/
+COPY src/shared/package.json /app/src/shared/
 
-COPY . /app
 WORKDIR /app
 
-RUN cp -a /tmp/node_modules /app/node_modules
+# Install dependencies including workspace packages
+RUN $HOME/.yarn/bin/yarn install
+
+# Copy the rest of the application
+COPY . /app
 
 ENV NODE_ENV=production
 

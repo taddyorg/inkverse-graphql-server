@@ -12,7 +12,7 @@ import { SeriesStatus, TaddyType } from '../shared/graphql/types.js';
 
 import type { ComicSeriesModel } from '../shared/database/types.js';
 import { ComicSeries, Creator } from '../shared/models/index.js';
-import { sendSlackNotification } from '@/shared/messaging/slack.js';
+import { sendSlackNotification } from '../shared/messaging/slack.js';
 
 const ComicSeriesDefinitions = `
   " Comic Series Details "

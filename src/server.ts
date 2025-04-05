@@ -29,6 +29,7 @@ const corsOptions = {
 
 async function startServer() {
   const app = express();
+  
 
   const httpServer = http.createServer(app);
 
@@ -93,15 +94,11 @@ async function startServer() {
   // setUpLogger();
   // setUpClient();
 
-  app.use('/api/worker', workerRouter);
-
   app.get('/api', (req, res) => {
     res.send('😁')
   });
 
-  app.get('/api/healthcheck', (req, res) => {
-    res.send('😁')
-  });
+  app.use('/api/worker', workerRouter);
 
   app.use((error: any, req: any, res: any, next: any) => {
     return errorMessageToJsonError(res, error)
