@@ -50,7 +50,7 @@ Resources:
       MultiAZ: false
       AllowMajorVersionUpgrade: false
       AutoMinorVersionUpgrade: true
-      DeletionProtection: false
+      DeletionProtection: true
       EnablePerformanceInsights : true
       CACertificateIdentifier: 'rds-ca-ecc384-g1'
       DBName: inkverse

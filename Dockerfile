@@ -1,6 +1,7 @@
 FROM node:20.17
 
-RUN mkdir app
+# Create and use /app
+WORKDIR /app
 
 RUN apt-get update -y && apt-get upgrade -y
 
@@ -10,21 +11,23 @@ RUN apt-get install apt-transport-https ca-certificates -y
 # Install yarn from the local .tgz
 RUN curl -o- -L https://yarnpkg.com/install.sh | bash
 
-# Copy package files first for better layer caching
-COPY package.json yarn.lock /app/
-COPY src/public/package.json /app/src/public/
-COPY src/shared/package.json /app/src/shared/
+# Copy package files first
+COPY package.json yarn.lock ./
+COPY src/public/package.json ./src/public/
+COPY src/shared/package.json ./src/shared/
 
-WORKDIR /app
-
-# Install dependencies including workspace packages
+# Install dependencies
 RUN $HOME/.yarn/bin/yarn install
 
-# Copy the rest of the application
-COPY . /app
+# Copy the rest of the application (after deps)
+COPY . .
+
+# Build the application during the Docker build phase
+RUN $HOME/.yarn/bin/yarn build
 
 ENV NODE_ENV=production
 
 EXPOSE 3010
 
-CMD [ "npm", "run", "start"]
+# Only run the server in the CMD, not the build
+CMD ["node", "dist/src/server.js"]
