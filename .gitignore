@@ -6,3 +6,4 @@ node_modules
 .vscode/
 yarn-error.log
 src/shared/node_modules
+stellate.js

@@ -13,24 +13,7 @@ This is the main server for Inkverse, a GraphQL API.
 
 - Copy the `.env.copy` file to `.env` in this project's root. You will fill in these values in the next couple of steps.
 
-2. Setup submodules
-
-This project contains 2 submodules: shared & public:
-- shared: contains shared code for backend Inkverse repos. ex) CRUD for Database.
-- public: contains constants used on both frontend & backend.
-
-```
-git submodule init
-git submodule update
-```
-
-to check that it installed properly
-```
-ls src/shared // make sure it has files/folders inside here
-ls src/public // make sure it has files/folders inside here
-```
-
-3. Setup databases
+2. Setup databases
 
 Inkverse's server requires the following databases:
 - Postgres (main database)
@@ -68,7 +51,7 @@ Some helpful docker commands:
 **docker start <containerId>** - Starts a container, once you have it setup your containers you can start and stop them ex) when your computer restarts.  
 **docker stop <containerId>** - Stops a container
 
-4. Setup AWS SQS Queues locally
+3. Setup AWS SQS Queues locally
 
 ```
 docker run -d --name inkverse-queues -p 4102:4100 admiralpiett/goaws
@@ -76,9 +59,9 @@ docker run -d --name inkverse-queues -p 4102:4100 admiralpiett/goaws
 
 This is a local message queue system that mimics AWS SQS queues. We use queues to handle sending emails, push notifications, etc.
 
-Everytime you restart the docker container (or your laptop) you will have to create the queues again and all messages in your queues will be deleted.
+Everytime you restart the docker container (or restart your laptop) you will have to create the queues again and all messages in your queues will be deleted.
 
-5. Setup JWT keys
+4. Setup JWT keys
 
 We need to generate a private & public key for signing & verifying JWT tokens. We use JWT tokens for user authentication. 
 
@@ -103,15 +86,19 @@ PRIVATE_JWT=
 
 You can delete the `jwt.key` and `jwt.key.pub` files (after you've copied them to the `.env` file).
 
-6. Install packages for this project
+5. Install packages for this project
 
 ```
-yarn install
+yarn install -W
 ```
 
 We use yarn workspaces to install packages for the whole project, including the shared modules.
 
-7. Run database migrations
+This project contains 2 shared modules: shared & public:
+- shared: contains shared code for backend Inkverse repos. ex) CRUD for Database.
+- public: contains constants used on both frontend & backend.
+
+6. Run database migrations
 
 ```
 yarn run migrate
@@ -121,7 +108,7 @@ You may run into an error where it states you cannot update a table because it h
 
 To fix this, move all the update table migrations to another folder, then run migrate again. Next, move the update table migrations back to the original folder and run migrate again.
 
-8. Localhost vs inkverse.test
+7. Localhost vs inkverse.test
 
 We use custom localhost (inkverse.test) vs localhost, the benefit is that you dont mix up cookies and other brower data between different localhost projects.
 
@@ -133,9 +120,9 @@ To set it up, add this to your hosts file, by `sudo vim /etc/hosts` on Mac/Linux
 127.0.0.1               us-east-1.goaws.com
 ```
 
-(us-east-1.goaws.com is used by inkverse-queues, so add that as well)
+You should also add `us-east-1.goaws.com` to your hosts file, as it is used by inkverse-queues.
 
-9. Run the server!
+8. Run the server!
 
 ```
 yarn run dev
@@ -164,5 +151,7 @@ docker stop inkverse-postgres && docker stop inkverse-queues
 If you make changes to the GraphQL schema, run the following command to generate types.
 
 ```
-yarn run codegen
+yarn run graphql-codegen
 ```
+
+This will generate the types in `src/shared/graphql`. Each repo has a `graphql-codegen.yml` file that is used to generate the types for that repo.
