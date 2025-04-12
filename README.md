@@ -61,6 +61,8 @@ This is a local message queue system that mimics AWS SQS queues. We use queues t
 
 Everytime you restart the docker container (or restart your laptop) you will have to create the queues again and all messages in your queues will be deleted.
 
+See Step 7 below for adding `us-east-1.goaws.com` to your hosts file.
+
 4. Setup JWT keys
 
 We need to generate a private & public key for signing & verifying JWT tokens. We use JWT tokens for user authentication. 
@@ -97,6 +99,8 @@ We use yarn workspaces to install packages for the whole project, including the 
 This project contains 2 shared modules: shared & public:
 - shared: contains shared code for backend Inkverse repos. ex) CRUD for Database.
 - public: contains constants used on both frontend & backend.
+
+Using -W installs dependencies for the whole project, including the shared modules.
 
 6. Run database migrations
 
